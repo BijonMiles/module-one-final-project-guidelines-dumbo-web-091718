@@ -3,8 +3,8 @@ require_relative '../config/environment'
 
 
 puts "HELLO WORLD"
-
-count_id = 0
+#
+# count_id = 0
 
 
 def welcome_account
@@ -53,19 +53,19 @@ def create_account
       account_type = account_type.upcase
     end
     account_name = nil
-    until account_name != nil
+    until account_name != nil && account_name.length >= 3
       puts `clear`
       puts "                                              "
       puts "                                              "
       puts "**************************"
       puts "PLEASE ENTER YOUR FULLNAME"
       puts "**************************"
-      account_name = gets.chomp
+      account_name = gets.chomp.upcase
       puts "--------------------------"
       puts "                                                 "
+      system "clear"
     end
     puts "~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ ~ *"
-    puts `clear`
     puts "                                              "
     puts "                                              "
     puts "**************************"
@@ -74,17 +74,21 @@ def create_account
     account_password = gets.chomp
     puts "--------------------------"
     puts "                                                 "
-    age = 200
+    account_age = 200
     until account_age > 18 && account_age < 80
+      system "clear"
       puts "~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ ~ *"
       puts "                            "
+      puts "              "
       puts "**************************"
       puts "      AGE:"
       puts "**************************"
       account_age = gets.chomp.to_i
     end
+    system "clear"
     puts "                                                 "
     puts "~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ ~ *"
+    puts "                    "
     puts "                            "
     puts "**************************"
     puts "      ADDRESS:"
@@ -92,7 +96,7 @@ def create_account
     account_address = gets.chomp
     puts "                                                 "
       account_gender=nil
-    until account_gender!="M" || account_gender!="F"
+    until account_gender=="M" || account_gender=="F"
       puts "~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ ~ *"
       puts "                            "
       puts "**************************"
@@ -100,17 +104,21 @@ def create_account
       puts "**************************"
       account_gender = gets.chomp.upcase
     end
-    puts "                                                 "
-    puts "~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ ~ *"
-    puts "                            "
-    puts "**************************"
-    puts "      INITIAL DEPOSIT:    "
-    puts "**************************"
-    account_balance = gets.chomp.to_f
-    puts "                                                 "
-    puts "~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ ~ *"
-    puts "            "
-    puts "            "
+    account_balance = -1
+    until account_balance >= 0
+      system "clear"
+      puts "                                                 "
+      puts "~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ ~ *"
+      puts "                            "
+      puts "**************************"
+      puts "      INITIAL DEPOSIT:    "
+      puts "**************************"
+      account_balance = gets.chomp.to_f
+      puts "                                                 "
+      puts "~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ ~ *"
+      puts "            "
+      puts "            "
+    end
     puts `clear`
     puts "            "
     puts "========================================================"
@@ -119,7 +127,11 @@ def create_account
     puts "Gender: #{account_gender}           Balance: $#{account_balance}"
     puts "========================================================"
     puts " Is this Information correct? y/n"
-    confirm = gets.chomp
+    confirm = gets.chomp.downcase
+    system "clear"
+    if confirm == "n"
+      welcome_account
+    end
   end
 
   if account_type == "L"
@@ -142,7 +154,7 @@ def existing_account
   puts "      **************************"
   puts "      PLEASE ENTER YOUR FULLNAME"
   puts "      **************************"
-  account_name = gets.chomp
+  account_name = gets.chomp.upcase
   # puts "--------------------------"
   # puts "                                                 "
   # puts "~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ * ~ ~ *"
@@ -245,6 +257,8 @@ end
 def transaction_account
   selection = nil
   until selection==1 || selection==2 || selection==3
+    puts "+++++++++++++++++++++++++++++++++++++++++++++++++++"
+    system "clear"
     puts  "                                               "
     puts "=================================================="
     puts "------ Welcome To Flatirons Banking System! ------"
@@ -256,8 +270,8 @@ def transaction_account
     puts "      (1)         (2)          (3)        (4)     "
     puts "                                                  "
     puts "    "
-    puts "    TRANSFER                    "
-    puts "       (5)                            "
+    puts "   TRANSFER   TRANSACTIONS    PASSWORD-CHANGE     "
+    puts "      (5)         (6)               (7)        "
     puts "__________________________________________________"
     selection = gets.chomp.to_i
 
@@ -271,7 +285,7 @@ def transaction_account
         puts "++++++++++++++++++++++++++++++++++++++++++++++++"
         puts "                                              "
         puts "      NAME:"
-        test_name = gets.chomp
+        test_name = gets.chomp.upcase
         puts "                        "
         puts "      PASSWORD"
         user_id = gets.chomp
@@ -339,10 +353,12 @@ def transaction_account
           puts "How much would you want to deposit?"
           deposit=gets.chomp.to_f
           account.balance+=deposit
+          TransactionAccount.create(account_name: account.name, details: "DEPOSIT", amount: deposit, account_two: "N/A")
           account.save
+
         elsif selection == 3
           puts "How much would you want to withdraw?"
-          withdraw=20000
+          withdraw=2000000000000
           until withdraw <= account.balance
             puts "How much do you want to withdraw?"
             withdraw=gets.chomp.to_f
@@ -355,6 +371,7 @@ def transaction_account
             end
           end
           account.balance-=withdraw
+          TransactionAccount.create(account_name: account.name, details: "WITHDRAW", amount: withdraw, account_two: "N/A")
           account.save
         end
         system "clear"
@@ -411,6 +428,7 @@ def transaction_account
           puts "How much do you want to deposit?"
           deposit=gets.chomp.to_f
           account.balance+=deposit
+          TransactionAccount.create(account_name: account.name, details: "DEPOSIT", amount: deposit, account_two: "N/A")
           account.save
         elsif selection == 3
           withdraw=20000
@@ -426,6 +444,7 @@ def transaction_account
             end
           end
           account.balance-= withdraw
+          TransactionAccount.create(account_name: account.name, details: "WITHDRAW", amount: withdraw, account_two: "N/A")
           account.save
 
         end
@@ -449,55 +468,127 @@ def transaction_account
 
     elsif selection == 6
 
-      puts "            "
-      puts "++++++++++++++++++++++++++++++++++++++++++++++++"
-      puts "                                              "
-      puts "What is your id?"
-      user_id=gets.chomp.to_i
-      puts "Lender/Borrower?  L/B"
-      type=gets.chomp.downcase
-      puts "            "
-      puts "+++++++++++++++++++++++++++++++++++++++++++++++++"
-      if type=="l"
-        account=LenderAccount.find_by(id:user_id)
-
-        if account.balance == nil
-          account.balance = 0
-        end
-
+      account = nil
+      until account != nil
+        # until user_id != nil
         puts `clear`
-        puts "                                      "
-        puts "==========================================================="
-        puts " Name: #{account.name}                        Age:#{account.age}"
-        puts " Status: LENDER          Address: #{account.address}"
-        puts " Balance: $#{account.balance}                        ID: #{account.id}"
-        puts "==========================================================="
+        puts "       *          *          *          *          "
+        puts "+++++++++++++++++++++++++++++++++++++++++++++++++++"
+        puts "                                              "
+        puts "      NAME:"
+        test_name = gets.chomp.upcase
         puts "                        "
-      elsif type == "b"
+        puts "      PASSWORD"
+        user_id = gets.chomp
+        # end
+        account = LenderAccount.find_by(name: test_name)
+        account ||= BorrowerAccount.find_by(name: test_name)
 
-        account=BorrowerAccount.find_by(id:user_id)
-
-        if account.balance == nil
-          account.balance = 0
+        # error here
+        if account == nil
+          puts "  +++++++++++++++++++++++++++++++++++++++++++++++++"
+          system "clear"
+          puts "                                        "
+          puts " Error 404: This Account ID OR NAME does not exist!"
+          puts "                  Please Try Again"
+          puts "          "
+          puts " Press Enter to Continue"
+          puts " Enter M for Main Menu             "
+          puts " Enter E for Exit"
+          time_stall = gets.chomp.downcase
+          if time_stall == "m"
+            transaction_account
+          elsif time_stall == "e"
+            system "clear"
+            exit
+          end
+        elsif (account.password != user_id)
+          puts "  +++++++++++++++++++++++++++++++++++++++++++++++++"
+          system "clear"
+          puts "                                        "
+          puts " Error 404: This Account PASSWORD is INCORRECT!"
+          puts "                  Please Try Again"
+          puts "          "
+          puts " Press Enter to Continue"
+          puts " Enter M for Main Menu             "
+          puts " Enter E for Exit"
+          puts "+++++++++++++++++++++++++++++++++++++++++++++++++++"
+          account = nil
+          time_stall = gets.chomp.downcase
+          if time_stall == "m"
+            transaction_account
+          elsif time_stall == "e"
+            system "clear"
+            exit
+          end
         end
-
-        puts `clear`
-        puts "                                      "
-        puts "==========================================================="
-        puts " Name: #{account.name}                        Age:#{account.age}"
-        puts " Status: LENDER          Address: #{account.address}"
-        puts " Balance: $#{account.balance}                        ID: #{account.id}"
-        puts "==========================================================="
-        puts "                        "
       end
-        puts " Finished? y/n"
-        choice = gets.chomp.downcase
-        if choice == "y" || choice == "yes"
-          puts `clear`
-        else
-          selection = nil
-          puts `clear`
+      system "clear"
+      count = 0
+      TransactionAccount.all.each do | transact_info |
+        if account.name == transact_info.account_name
+
+          puts "        "
+          puts "========================================================================================================"
+          puts " Name: #{transact_info.account_name}                 #{transact_info.details}                      Amount: $#{transact_info.amount}    "
+          if transact_info.details == "TRANSFER"
+            puts "Receiver: #{transact_info.account_two}"
+            puts "========================================================================================================"
+          else
+            puts "========================================================================================================"
+          end
+          count += 1
+        elsif account.name == transact_info.account_two
+          puts "        "
+          puts "========================================================================================================"
+          puts " Name: #{transact_info.account_two}                     #{transact_info.details}                   Received Amount: $#{transact_info.amount}    "
+          if transact_info.details == "TRANSFER"
+            puts "Sender: #{transact_info.account_name}"
+            puts "========================================================================================================"
+          else
+            puts "========================================================================================================"
+          end
+          count+=1
         end
+      end
+
+      # TransactionAccount.all.each do | transact_info |
+      #   if account.name == transact_info.account_two
+      #
+      #     puts "        "
+      #     puts "========================================================================================================"
+      #     puts " Name: #{transact_info.account_two}                     #{transact_info.details}                   Received Amount: $#{transact_info.amount}    "
+      #     if transact_info.details == "TRANSFER"
+      #       puts "Sender: #{transact_info.account_name}"
+      #       puts "========================================================================================================"
+      #     else
+      #       puts "========================================================================================================"
+      #     end
+      #     count += 1
+      #   end
+      # end
+
+      if count == 0
+        system "clear"
+        puts "
+
+        "
+        puts "                                   *********                                 "
+        puts "                            YOU HAVE NO TRANSACTIONS!!"
+        puts "                                 *************"
+      end
+      puts "
+
+      "
+      puts " Finished? y/n"
+      choice = gets.chomp.downcase
+      if choice == "y" || choice == "yes"
+        puts `clear`
+        exit
+      else
+        system "clear"
+        transaction_account
+      end
 
 
     elsif selection == 4
@@ -506,6 +597,8 @@ def transaction_account
     elsif selection == 5
       transfer_money
 
+    elsif selection == 7
+      change_password
     end
   end
 end
@@ -523,7 +616,7 @@ def transfer_money
     puts "   *     *      *       *      *      *      *     *     *    "
     puts "                                                 "
     puts " NAME:      "
-    test_name = gets.chomp
+    test_name = gets.chomp.upcase
     puts "_______________________________________________________________"
     puts "            "
     puts "PASSWORD:                                         "
@@ -569,20 +662,20 @@ def transfer_money
         exit
       end
     end
-
-    puts `clear`
-    puts "     *          *             *           *           *     "
-    puts "==========================================================="
-    puts " Name: #{account.name}                        Age:#{account.age}"
-    puts " Status: #{account.status}          Address: #{account.address}"
-    puts " Balance: $#{account.balance}                        ID: #{account.id}"
-    puts "==========================================================="
-    puts "     *          *             *           *           *                   "
-    puts "                "
-    puts "                                                "
-    puts "TRANSFER FUND TO: "
-    test_name2 = gets.chomp
   end
+  puts `clear`
+  puts "     *          *             *           *           *     "
+  puts "==========================================================="
+  puts " Name: #{account.name}                        Age:#{account.age}"
+  puts " Status: #{account.status}          Address: #{account.address}"
+  puts " Balance: $#{account.balance}                        ID: #{account.id}"
+  puts "==========================================================="
+  puts "     *          *             *           *           *                   "
+  puts "                "
+  puts "                                                "
+  puts "TRANSFER FUND TO: "
+  test_name2 = gets.chomp.upcase
+
   account2 = nil
   until account2 != nil
 
@@ -605,7 +698,7 @@ def transfer_money
       puts "                "
       puts "                                                "
       puts "TRANSFER FUND TO: "
-      test_name2 = gets.chomp
+      test_name2 = gets.chomp.upcase
     end
   end
 
@@ -613,12 +706,12 @@ def transfer_money
   until choices == "y" || choices == "yes"
     # put something here
     transfer_amount = 2000000000000000000000000000000
-    until transfer_amount <= account.balance
+    until transfer_amount <= account.balance && transfer_amount > 0
 
       puts "                        "
       puts " TRANSFER AMOUNT:"
       transfer_amount = gets.chomp.to_f
-      if transfer_amount > account.balance
+      if transfer_amount > account.balance || transfer_amount < 0
         system "clear"
         puts "            ERROR ERROR ERROR"
         puts " Amount too much please Try Again!"
@@ -653,6 +746,7 @@ def transfer_money
   end
   account.balance -= transfer_amount
   account2.balance += transfer_amount
+  TransactionAccount.create(account_name: account.name, details: "TRANSFER", amount: transfer_amount, account_two: account2.name)
   account.save
   account2.save
 
@@ -677,10 +771,159 @@ def transfer_money
   transaction_account
   puts "    "
 end
+
+
+def change_password
+  account = nil
+
+  until account != nil
+    # until user_id != nil
+    puts `clear`
+    puts "       *          *          *          *          "
+    puts "+++++++++++++++++++++++++++++++++++++++++++++++++++"
+    puts "                                              "
+    puts "      NAME:"
+    test_name = gets.chomp.upcase
+    puts "                        "
+    puts "      PASSWORD"
+    user_id = gets.chomp
+    # end
+    account = LenderAccount.find_by(name: test_name)
+    account ||= BorrowerAccount.find_by(name: test_name)
+
+    # error here
+    if account == nil
+      puts "  +++++++++++++++++++++++++++++++++++++++++++++++++"
+      system "clear"
+      puts "                                        "
+      puts " Error 404: This Account ID OR NAME does not exist!"
+      puts "                  Please Try Again"
+      puts "          "
+      puts " Press Enter to Continue"
+      puts " Enter M for Main Menu             "
+      puts " Enter E for Exit"
+      time_stall = gets.chomp.downcase
+      if time_stall == "m"
+        transaction_account
+      elsif time_stall == "e"
+        system "clear"
+        exit
+      end
+    elsif (account.password != user_id)
+      puts "  +++++++++++++++++++++++++++++++++++++++++++++++++"
+      system "clear"
+      puts "                                        "
+      puts " Error 404: This Account PASSWORD is INCORRECT!"
+      puts "                  Please Try Again"
+      puts "          "
+      puts " Press Enter to Continue"
+      puts " Enter M for Main Menu             "
+      puts " Enter E for Exit"
+      puts "+++++++++++++++++++++++++++++++++++++++++++++++++++"
+      account = nil
+      time_stall = gets.chomp.downcase
+      if time_stall == "m"
+        transaction_account
+      elsif time_stall == "e"
+        system "clear"
+        exit
+      end
+    end
+  end
+  system "clear"
+  confirm = false
+  until confirm == true
+
+    puts "                                             M for Main Menu"
+    puts "                                                            "
+    puts "------------------------------------------------------------"
+    puts"                 NEW PASSWORD                        "
+    puts"-------------------------------------------------------------
+    "
+    new_password=gets.chomp
+    if new_password == "m" || new_password == "M"
+      transaction_account
+    end
+    puts "                                                              "
+    puts"-------------------------------------------------------------"
+    puts"                RE-ENTER PASSWORD                   "
+    puts"-------------------------------------------------------------
+    "
+      new_password_two=gets.chomp
+      if new_password_two == "m" || new_password_two == "M"
+        transaction_account
+      end
+
+      if new_password == new_password_two
+        account.password=new_password
+        account.save
+        confirm = true
+        system "clear"
+        puts "
+
+
+
+        "
+        puts "                           *******"
+        puts "                      CONGRATULATIONS !!!!!"
+        puts "                            *****"
+        puts "
+                "
+        puts "                  PASSWORD SUCCESSFULLY CHANGED"
+        puts "
+
+        "
+        puts "Press Enter To Continue"
+        time_stall = gets.chomp
+        transaction_account
+      else
+        puts " +++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+        system "clear"
+        puts"
+
+        "
+        puts "                    NEW PASSWORDS DONT MATCH"
+        puts "
+        "
+
+      end
+    end
+end
+
+# def name_change
+#   test_name = gets.chomp
+#   account = BorrowerAccount.find_by(name: test_name)
+#   account ||= LenderAccount.find_by(name: test_name)
+#
+#   TransactionAccount.all.each do | info |
+#     info.account_name == test_name
+#
+#     if info.amount < 0
+#       info.amount = 10
+#       info.save
+#
+#
+#     end
+#
+#
+#   end
+
+
+
+  # account.account_name = new_name
+  # account.amount = account.account_two
+  # account.save
+#   system "clear"
+#
+#
+# end
+
+
 # def find_account
 #
 #
 # end
+# name_change
 
 # transaction_account
 welcome_account
